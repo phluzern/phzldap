@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>database</type>
+		<description>Language labels for database tables/fields belonging to extension 'phzldap'</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="tt_content.list_type_pi1">FE Login Box</label>
+			<label index="tt_content.list_type_pi2">Shibboleth Auto FE Login</label>
+		</languageKey>
+		<languageKey index="de" type="array">
+			<label index="tt_content.list_type_pi1">FE Login Box</label>
+			<label index="tt_content.list_type_pi2">Shibboleth Auto FE Login</label>
+		</languageKey>
+	</data>
+</T3locallang>

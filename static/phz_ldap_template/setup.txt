@@ -1,0 +1,6 @@
+plugin.tx_phzldap_pi1 {
+	templateFile = EXT:phzldap/resources/templates/template_pi1.html 
+	message.wrap = <div id="phzldap_message">|</div>
+	message.required = 1
+	redirectParameter = redirectUid
+}

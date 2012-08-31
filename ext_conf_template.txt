@@ -1,0 +1,29 @@
+# cat=basic; type=int+; label=Auth Priority: maximum 100
+priority = 100
+
+# cat=basic; type=int+; label=Storage Pid: Storage Folder for Frontend Users
+storagePid = 0
+
+# cat=basic; type=int+; label=Default FE user group
+defaultGroupId = 0
+
+# cat=basic; type=string; label=Evento codes to FE user group conversion (eventoCode=feUserGroup,...)
+conversionList =
+
+# cat=basic; type=string; label=Shibboleth UserID ServerVar
+remoteUser = REMOTE_USER
+
+# cat=basic; type=string; label=Shibboleth user email ServerVar
+mail = mail
+
+# cat=basic; type=string; label=Shibboleth firstName ServerVar
+firstName = firstName
+
+# cat=basic; type=string; label=Shibboleth lastName ServerVar
+lastName = lastName
+
+# cat=basic; type=string; label=Evento Webservice URL
+webserviceUrl =
+
+# cat=basic; type=string; label=Evento Webservice password
+webservicePwd =

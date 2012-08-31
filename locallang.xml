@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for extension 'phzldap'</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="pi1_title">FE Login Box</label>
+			<label index="pi1_plus_wiz_description">Frontend user login </label>
+			<label index="pi2_title">Shibboleth Auto FE Login</label>
+			<label index="pi2_plus_wiz_description">Loggin in users automatically that are Shibboleth authenticated.</label>
+		</languageKey>
+		<languageKey index="de" type="array">
+			<label index="pi1_title">FE Login Box</label>
+			<label index="pi1_plus_wiz_description">Frontend Benutzer Anmeldung</label>
+			<label index="pi2_title">Shibboleth Auto FE Login</label>
+			<label index="pi2_plus_wiz_description">Automatische TYPO3-Anmeldung für Benutzer, die Shibboleth-authentifiziert sind.</label>
+		</languageKey>
+	</data>
+</T3locallang>

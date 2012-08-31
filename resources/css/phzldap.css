@@ -1,0 +1,26 @@
+@charset "UTF-8";
+
+@media all
+{
+	label {
+		display: block; 
+		float: left; 
+		width: 10em; 
+	}
+	
+	.type-text, .type-password, .type-submit { margin: 0.5em; }
+	
+	.type-submit input { margin-left: 10em; }
+	
+	.type-text input,
+	.type-password input {
+		width: 10em;
+	}
+	
+	#phzldap_message { 
+		margin: 1em 0.5em;
+		padding: 0.75em;
+		background:#FFEEEE none repeat scroll 0 0;
+		border:2px solid #884444;	
+	 }
+}

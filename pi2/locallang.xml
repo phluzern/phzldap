@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for plugin &quot;tx_phzldap_pi2&quot;</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="sheet.general.title">General</label>
+			<label index="sheet.general.successuid.label">Redirect to page by successful login</label>
+			<label index="sheet.general.template.label">Template File</label>
+			<label index="no_hostname_set">Set 'hostname' in your TS template</label>
+			<label index="no_basedn_set">Set 'basedn' in your TS template</label>
+			<label index="no_template_found">No template was found</label>
+			<label index="no_folder_uid_set">Set 'folder_uid' in your TS template</label>
+			<label index="no_cruser_id_set">Set 'cruser_id' in your TS template</label>
+			<label index="no_default_groupid_set">Set 'default_groupid' in your TS template</label>
+			<label index="no_ldap_server_found">Connect to LDAP server failed</label>
+			<label index="no_template_set">No template found. Use 'templateFile' in your TS template</label>
+			<label index="no_success_uid_set">No success uid/redirect uid was found. Set this value in the Flexform or in your TS template</label>
+			<label index="message_login_failed">Username or password incorrect!</label>
+			<label index="message_no_username_or_password">Enter username and password!</label>
+			<label index="message_create_or_update_user_failed">An internal error occured regarding your user profile. Please try again.</label>
+			<label index="label_username">Username</label>
+			<label index="label_password">Password</label>
+			<label index="label_submit">Login</label>
+			<label index="message_exception">An exception occured. Please try again later!</label>
+			<label index="message_typo3_login_failed">System login failed, please contact the support.</label>
+		</languageKey>
+		<languageKey index="de" type="array">
+			<label index="sheet.general.title">Allgmein</label>
+			<label index="sheet.general.template.label">Template Datei</label>
+			<label index="sheet.general.successuid.label">Weiterleitung bei erfolgreichem Login</label>
+			<label index="no_hostname_set">'hostname' muss im TS template gesetzt werden</label>
+			<label index="no_basedn_set">'basedn' muss im TS template gesetzt werden</label>
+			<label index="no_template_found">Es wurde kein Template gefunden</label>
+			<label index="no_folder_uid_set">'folder_uid' muss im TS template gesetzt werden</label>
+			<label index="no_cruser_id_set">'cruser_id' muss im TS template gesetzt werden</label>
+			<label index="no_webservice_url_set">'webserviceUrl' muss im TS template gesetzt werden</label>
+			<label index="no_webservice_pwd_set">'webservicePwd' muss im TS template gesetzt werden</label>
+			<label index="no_default_groupid_set">'default_groupid' muss im TS template gesetzt werden</label>
+			<label index="no_ldap_server_found">Es konnte keine Verbindung zum LDAP Server hergestellt werden</label>
+			<label index="no_template_set">Kein Template gefunden. 'templateFile' muss im TS template gesetzt werden</label>
+			<label index="no_success_uid_set">'success_uid' oder der Flexform Wert 'Weiterleitung bei erfolgreichem Login' wurden nicht gesetzt</label>
+			<label index="message_login_failed">Benutzername oder Passwort ist ungültig!</label>
+			<label index="message_no_username_or_password">Benutzername und Passwort eingeben!</label>
+			<label index="label_username">Benutzername</label>
+			<label index="label_password">Kennwort</label>
+			<label index="label_submit">Login</label>
+			<label index="message_create_or_update_user_failed">Ihr Benutzerprofil konnte nicht aktualisiert werden, bitte versuchen Sie es später nocheinmal.</label>
+			<label index="message_create_or_update_user_from_evento_failed">Hier kommt die wahnsinnige Fehlermeldung, wenn jemand nicht per GET angemeldet werden konnte Schön, dass auch das getestet wird..</label>
+			<label index="message_exception">Es ist ein Ausnahmefehler aufgetreten. Bitte versuchen Sie es später nocheinmal!</label>
+			<label index="message_typo3_login_failed">Das System konnte Sie nicht anmelden, bitte wenden Sie sich an den Support.</label>
+		</languageKey>
+	</data>
+</T3locallang>
