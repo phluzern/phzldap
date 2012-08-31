@@ -4,25 +4,31 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>Insert title here</title>
 		<!-- ###HEADER_PARTS### begin -->
-		<link rel="stylesheet" type="text/css" href="###SITE_REL_PATH###resources/css/phzldap.css" />
-		<!-- ###HEADER_PARTS### end -->			
+		<!-- ###HEADER_PARTS### end -->
 	</head>
 	<body>
 		<!-- ###LOGIN_LINK### begin -->
-		<div class="tx_phzldap">
+		<div class="globalLinksLogin">
 			<a href="###LOGINHANDLERURL###">Login</a>
 		</div>
 		<!-- ###LOGIN_LINK### end -->
 
 		<!-- ###LOGIN_SUCCESS### begin -->
-		<div class="tx_phzldap">
-			<a href="#">Mein Konto</a>
-			<div class="myAccountOverlay">
+		<div class="globalLinksLogin">
+			<a href="#">Konto</a>
+			<span class="myAccountOverlay">
 				Angemeldet als ###DISPLAY_NAME###<br />
 				<a href="###LOGOUT_URL###">Logout</a>
 				<hr />
-				<a href="http://mail.phz.ch" target="_blank">Outlook Webmail</a><br />
-			</div>
+				<p>
+					<a href="http://mail.phz.ch" target="_blank">Webmail MA/Doz</a><br />
+					<a href="http://webmail.phz.ch/src/login.php" target="_blank">Webmail Studierende</a><br />
+					<a href="https://evento-web.phz.ch/" target="_blank">Evento-Web</a><br />
+					<a href="http://moodle.phz.ch/" target="_blank">Moodle</a><br />
+					<a href="http://www.luzern.phz.ch/extranet/" target="_blank">Extranet</a><br />
+					<a href="http://ict.luzern.phz.ch/" target="_blank">ICT-Website</a>
+				</p>
+			</span>
 		</div>
 		<!-- ###LOGIN_SUCCESS### end -->
 

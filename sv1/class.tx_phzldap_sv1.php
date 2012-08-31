@@ -67,7 +67,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 		if (defined('TYPO3_cliMode')) {
 			return parent::initAuth($mode, $loginData, $authInfo, $pObj);
 		}
-		t3lib_utility_Debug::debug($authInfo,'authInfo');
+		//t3lib_utility_Debug::debug($authInfo,'authInfo');
 
 		$this->login = $loginData;
 		if (empty($this->login['uname'])) {
@@ -88,7 +88,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 			}
 			$user = $this->fetchUserRecord($this->remoteUser);
 		}
-		t3lib_utility_Debug::debug($user, 'userRecord');
+		//t3lib_utility_Debug::debug($user, 'userRecord');
 
 		return $user;
 	}

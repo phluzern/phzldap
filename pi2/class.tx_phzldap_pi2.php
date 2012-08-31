@@ -92,13 +92,13 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 			$this->successRedirectUrl = $this->pi_linkTP_keepPIvars_url($params, $cache=0, $clearAnyway=0, $altPageId=0);
 		}
 
-		t3lib_utility_Debug::debug($conf, 'conf');
-		t3lib_utility_Debug::debug($_SERVER, 'SERVER');
+		//t3lib_utility_Debug::debug($conf, 'conf');
+		//t3lib_utility_Debug::debug($_SERVER, 'SERVER');
 
 			// is the user logged in?
 		$this->userIsLoggedIn = $GLOBALS['TSFE']->loginUser;
 
-		t3lib_utility_Debug::debug($this->userIsLoggedIn, 'userIsLoggedIn');
+		//t3lib_utility_Debug::debug($this->userIsLoggedIn, 'userIsLoggedIn');
 
 
 		if (!$this->userIsLoggedIn) {
@@ -123,7 +123,7 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		$feUserPid .= !stristr($this->successRedirectUrl, '?') ? '?' : '&';
 		$feUserPid .= 'pid=' . (int)$this->conf['folder_uid'];
 		$loginHandlerUrl = $this->conf['sslHost'] . $this->conf['shibbolethLoginHandler'] . '&target=' . urlencode($this->successRedirectUrl . $feUserPid);
-		t3lib_utility_Debug::debug($loginHandlerUrl,'loginHandlerUrl');
+		//t3lib_utility_Debug::debug($loginHandlerUrl,'loginHandlerUrl');
 		$marker['###LOGINHANDLERURL###'] = $loginHandlerUrl;
 
 		return $this->cObj->substituteMarkerArray($form, $marker);		

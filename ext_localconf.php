@@ -8,8 +8,6 @@ t3lib_extMgm::addPItoST43($_EXTKEY, 'pi2/class.tx_phzldap_pi2.php', '_pi2', 'lis
 
 $GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = TRUE;;
 
-t3lib_utility_Debug::debug('hier');
-
 t3lib_extMgm::addService($_EXTKEY, 'auth',  'tx_phzldap_sv1',
 	array(
 		'title' => 'Shibboleth-Authentication',
