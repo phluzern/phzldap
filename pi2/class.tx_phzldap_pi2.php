@@ -107,7 +107,7 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 			$content = $this->renderLoginSuccess('');
 		}
 
-		return $this->pi_wrapInBaseClass($content);
+		return $content;
 	}
 
 	/**
