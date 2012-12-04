@@ -243,7 +243,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 				foreach ($readResult->Records->Record as $recordId => $record) {
 					foreach ($columns as $colId => $col) {
 							// we only need the IDPersonenTyp in our $eventoCodes array
-							print_r($col->Name.' id:'.$colId.' rec:'.$record."\n");
+							//print_r($col->Name.' id:'.$colId.' rec:'.$record."\n");
 						if ($col->Name === 'IDCode') {
 							$eventoCodes[$recordId] = tx_t3evento_helper::getRecordValueByColumnId($record, $readResult->Columns, $readResult, $colId);
 						}
