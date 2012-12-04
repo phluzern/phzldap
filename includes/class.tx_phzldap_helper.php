@@ -118,7 +118,7 @@ class tx_phzldap_helper {
 	public static function createOrUpdateFeUser($password, $attributes, $conf) {
 		$username = $attributes['eventoId'];
 		
-		//Check if frontend user exists in T3
+		// Check if frontend user exists in T3
 		$sql = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'fe_users', 'disable = 0 AND deleted = 0 AND username = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($username, 'fe_users'));
 		if ($GLOBALS['TYPO3_DB']->sql_fetch_assoc($sql) == true)
         {

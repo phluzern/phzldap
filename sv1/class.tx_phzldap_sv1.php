@@ -67,28 +67,31 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 		if (defined('TYPO3_cliMode')) {
 			return parent::initAuth($mode, $loginData, $authInfo, $pObj);
 		}
-		//t3lib_utility_Debug::debug($authInfo,'authInfo');
 
 		$this->login = $loginData;
-		if (empty($this->login['uname'])) {
+
+		// if no PID is set, this is not a login attempt
+		$pid = t3lib_div::_GP('pid');
+		if (empty($this->login['uname']) && !empty($pid)) {
 			$loginData['status'] = 'login';
 			parent::initAuth($mode, $loginData, $authInfo, $pObj);
 		}
 	}
 	
 	function getUser() {
-		$user = false;
+		$user = FALSE;
+
+		//$GLOBALS['TYPO3_DB']->debugOutput = 2;
 		if ($this->login['status']=='login' && $this->isShibbolethLogin() && empty($this->login['uname'])) {
 			$user = $this->fetchUserRecord($this->remoteUser);
-//t3lib_utility_Debug::debug($user);
-			if(!is_array($user) || empty($user)) {
+			if (!is_array($user) || empty($user)) {
 				$this->importFEUser();
 			} else {
-				$this->updateFEUser();
+				$this->updateFEUser($user['uid']);
 			}
 			$user = $this->fetchUserRecord($this->remoteUser);
+
 		}
-		//t3lib_utility_Debug::debug($user, 'userRecord');
 
 		return $user;
 	}
@@ -123,7 +126,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 			'tstamp' => time(),
 			'pid' => $this->extConf['storagePid'],
 			'username' => $this->remoteUser,
-			'password' => md5(t3lib_div::shortMD5(uniqid(rand(), true))),
+			'password' => 'lalalala' . md5(t3lib_div::shortMD5(uniqid(rand(), true))),
 			'email' => $this->getServerVar($this->extConf['mail']),
 			'name' => $this->getServerVar($this->extConf['firstName']) . ' ' . $this->getServerVar($this->extConf['lastName']),
 			'usergroup' => $this->getFEUserGroups($this->remoteUser),
@@ -134,17 +137,18 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	/**
 	 * @return	boolean
 	 */
-	protected function updateFEUser() {
+	protected function updateFEUser($userId) {
 		$this->writelog(255,3,3,2,	"Updating user %s!", array($this->remoteUser));
-		
-		$where = "username = '" . $this->remoteUser . "' AND pid = " . $this->extConf['storagePid'];
-		$user = array('tstamp' => time(),
+
+		$where = "uid = " . $userId;
+		$user = array(
+			'tstamp' => time(),
 			'username' => $this->remoteUser,
 			'password' => t3lib_div::shortMD5(uniqid(rand(), true)),
 			'email' => $this->getServerVar($this->extConf['mail']),
 			'name' => $this->getServerVar($this->extConf['firstName']) . ' ' . $this->getServerVar($this->extConf['lastName']),
 			'usergroup' => $this->getFEUserGroups($this->remoteUser),
-			);
+		);
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery($this->authInfo['db_user']['table'], $where, $user);
 	}
 
