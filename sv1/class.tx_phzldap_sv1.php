@@ -235,15 +235,28 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 			}
 
 			$eventoCodes = array();
-			foreach ($readResult->Records->Record as $recordId => $record) {
-				foreach ($columns as $colId => $col) {
-						// we only need the IDPersonenTyp in our $eventoCodes array
-					if ($col->Name === 'IDCode') {
-						$eventoCodes[$recordId] = tx_t3evento_helper::getRecordValueByColumnId($record, $readResult->Columns, $readResult, $colId);
+			if(is_array($readResult->Records->Record)){
+				foreach ($readResult->Records->Record as $recordId => $record) {
+					foreach ($columns as $colId => $col) {
+							// we only need the IDPersonenTyp in our $eventoCodes array
+							print_r($col->Name.' id:'.$colId.' rec:'.$record."\n");
+						if ($col->Name === 'IDCode') {
+							$eventoCodes[$recordId] = tx_t3evento_helper::getRecordValueByColumnId($record, $readResult->Columns, $readResult, $colId);
+						}
 					}
 				}
 			}
+			else {
+				// records enthält nur einen eintrag (ist kein array)
+				$record = $readResult->Records->Record;
 
+				foreach ($columns as $colId => $col) {
+					// we only need the IDPersonenTyp in our $eventoCodes array
+					if ($col->Name === 'IDCode') {
+						$eventoCodes[0] = tx_t3evento_helper::getRecordValueByColumnId($record, $readResult->Columns, $readResult, $colId);
+					}
+				}
+			}
 			return $eventoCodes;
 		}
 
