@@ -126,7 +126,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 			'tstamp' => time(),
 			'pid' => $this->extConf['storagePid'],
 			'username' => $this->remoteUser,
-			'password' => 'lalalala' . md5(t3lib_div::shortMD5(uniqid(rand(), true))),
+			'password' => md5(t3lib_div::shortMD5(uniqid(rand(), true))),
 			'email' => $this->getServerVar($this->extConf['mail']),
 			'name' => $this->getServerVar($this->extConf['firstName']) . ' ' . $this->getServerVar($this->extConf['lastName']),
 			'usergroup' => $this->getFEUserGroups($this->remoteUser),
