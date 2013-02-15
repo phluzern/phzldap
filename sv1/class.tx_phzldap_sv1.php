@@ -50,31 +50,6 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	 * @return	void
 	 */
 	public function init() {
-
-		if (!isset($GLOBALS['TSFE']->tmpl->setup)) {
-			/* Initialize TypoScript setup in TSFE */
-			$GLOBALS['TSFE']->determineId();
-			$GLOBALS['TSFE']->getCompressedTCarray();
-			$GLOBALS['TSFE']->initTemplate();
-			$GLOBALS['TSFE']->getConfigArray();
-		}
-
-		/** @var $objectManager Tx_Extbase_Object_ObjectManager */
-		$objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
-		/** @var $configurationManager Tx_Extbase_Configuration_ConfigurationManagerInterface */
-		$configurationManager = $objectManager->get('Tx_Extbase_Configuration_ConfigurationManagerInterface');
-		$this->settings = $configurationManager->getConfiguration(
-			Tx_Extbase_Configuration_ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
-			'phzldap',
-			'pi2'
-		);
-
-		/* If remote user identifier is not defined, switch to standard */
-		if (empty($this->settings['remoteUser'])) {
-			$this->settings['remoteUser'] = 'REMOTE_USER';
-		}
-		$this->remoteUser = $_SERVER[$this->settings['remoteUser']];
-
 		return parent::init();
 	}
 	
@@ -97,6 +72,28 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 		// if no PID is set, this is not a login attempt
 		$pid = t3lib_div::_GP('pid');
 		if (empty($this->login['uname']) && !empty($pid)) {
+			/* Initialize TypoScript setup in TSFE */
+			$GLOBALS['TSFE']->determineId();
+			$GLOBALS['TSFE']->getCompressedTCarray();
+			$GLOBALS['TSFE']->initTemplate();
+			$GLOBALS['TSFE']->getConfigArray();
+
+			/** @var $objectManager Tx_Extbase_Object_ObjectManager */
+			$objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
+			/** @var $configurationManager Tx_Extbase_Configuration_ConfigurationManagerInterface */
+			$configurationManager = $objectManager->get('Tx_Extbase_Configuration_ConfigurationManagerInterface');
+			$this->settings = $configurationManager->getConfiguration(
+				Tx_Extbase_Configuration_ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
+				'phzldap',
+				'pi2'
+			);
+
+			/* If remote user identifier is not defined, switch to standard */
+			if (empty($this->settings['remoteUser'])) {
+				$this->settings['remoteUser'] = 'REMOTE_USER';
+			}
+			$this->remoteUser = $_SERVER[$this->settings['remoteUser']];
+
 			$loginData['status'] = 'login';
 			parent::initAuth($mode, $loginData, $authInfo, $pObj);
 		}
