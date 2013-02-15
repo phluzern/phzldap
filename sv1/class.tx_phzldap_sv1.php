@@ -50,11 +50,14 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	 * @return	void
 	 */
 	public function init() {
-		/* Initialize TypoScript setup in TSFE */
-		$GLOBALS['TSFE']->determineId();
-		$GLOBALS['TSFE']->getCompressedTCarray();
-		$GLOBALS['TSFE']->initTemplate();
-		$GLOBALS['TSFE']->getConfigArray();
+
+		if (!isset($GLOBALS['TSFE']->tmpl->setup)) {
+			/* Initialize TypoScript setup in TSFE */
+			$GLOBALS['TSFE']->determineId();
+			$GLOBALS['TSFE']->getCompressedTCarray();
+			$GLOBALS['TSFE']->initTemplate();
+			$GLOBALS['TSFE']->getConfigArray();
+		}
 
 		/** @var $objectManager Tx_Extbase_Object_ObjectManager */
 		$objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
