@@ -7,11 +7,11 @@
 	<data type="array">
 		<languageKey index="default" type="array">
 			<label index="tt_content.list_type_pi1">FE Login Box</label>
-			<label index="tt_content.list_type_pi2">Shibboleth Auto FE Login</label>
+			<label index="tt_content.list_type_pi2">Shibboleth Frontend Login</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="tt_content.list_type_pi1">FE Login Box</label>
-			<label index="tt_content.list_type_pi2">Shibboleth Auto FE Login</label>
+			<label index="tt_content.list_type_pi2">Shibboleth Frontend Login</label>
 		</languageKey>
 	</data>
 </T3locallang>

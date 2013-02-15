@@ -3,6 +3,7 @@
 *  Copyright notice
 *
 *  (c) 2011 Tamer Erdoğan <tamer.erdogan@univie.ac.at>
+*  (c) 2012-2013 Lorenz Ulrich <lorenz.ulrich@phz.ch>
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -37,8 +38,10 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	public $scriptRelPath = 'sv1/class.tx_phzldap_sv1.php';	// Path to this script relative to the extension dir.
 	public $extKey = 'phzldap';	// The extension key.
 	public $pObj;
-	
-	protected $extConf;
+
+	/** @var array TypoScript settings */
+	protected $settings;
+	/** @var string User name identifier in the Shibboleth session */
 	protected $remoteUser;
 	
 	/**
@@ -46,10 +49,28 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	 *
 	 * @return	void
 	 */
-	function init() {
-		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
-		if (empty($this->extConf['remoteUser'])) $this->extConf['remoteUser'] = 'REMOTE_USER';
-		$this->remoteUser = $_SERVER[$this->extConf['remoteUser']];
+	public function init() {
+		/* Initialize TypoScript setup in TSFE */
+		$GLOBALS['TSFE']->determineId();
+		$GLOBALS['TSFE']->getCompressedTCarray();
+		$GLOBALS['TSFE']->initTemplate();
+		$GLOBALS['TSFE']->getConfigArray();
+
+		/** @var $objectManager Tx_Extbase_Object_ObjectManager */
+		$objectManager = t3lib_div::makeInstance('Tx_Extbase_Object_ObjectManager');
+		/** @var $configurationManager Tx_Extbase_Configuration_ConfigurationManagerInterface */
+		$configurationManager = $objectManager->get('Tx_Extbase_Configuration_ConfigurationManagerInterface');
+		$this->settings = $configurationManager->getConfiguration(
+			Tx_Extbase_Configuration_ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
+			'phzldap',
+			'pi2'
+		);
+
+		/* If remote user identifier is not defined, switch to standard */
+		if (empty($this->settings['remoteUser'])) {
+			$this->settings['remoteUser'] = 'REMOTE_USER';
+		}
+		$this->remoteUser = $_SERVER[$this->settings['remoteUser']];
 
 		return parent::init();
 	}
@@ -63,7 +84,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	 * @param	object		Parent object
 	 * @return	mixed
 	 */
-	function initAuth($mode, $loginData, $authInfo, $pObj) {
+	public function initAuth($mode, $loginData, $authInfo, $pObj) {
 		if (defined('TYPO3_cliMode')) {
 			return parent::initAuth($mode, $loginData, $authInfo, $pObj);
 		}
@@ -77,11 +98,13 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 			parent::initAuth($mode, $loginData, $authInfo, $pObj);
 		}
 	}
-	
-	function getUser() {
+
+	/**
+	 * @return bool|mixed
+	 */
+	public function getUser() {
 		$user = FALSE;
 
-		//$GLOBALS['TYPO3_DB']->debugOutput = 2;
 		if ($this->login['status']=='login' && $this->isShibbolethLogin() && empty($this->login['uname'])) {
 			$user = $this->fetchUserRecord($this->remoteUser);
 			if (!is_array($user) || empty($user)) {
@@ -107,7 +130,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	 * @param	array		Array containing FE user data of the logged user.
 	 * @return	integer		authentication statuscode, one of 0,100 and 200
 	 */
-	function authUser($user) {
+	public function authUser($user) {
 		$OK = 100;
 
 		if (($this->authInfo['loginType'] == 'FE') && !empty($this->login['uname'])) {
@@ -118,24 +141,30 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 		
 		return $OK;
 	}
-	
+
+	/**
+	 *
+	 */
 	protected function importFEUser() {
 		$this->writelog(255,3,3,2, "Importing user %s!", array($this->remoteUser));
 
 		$user = array('crdate' => time(),
 			'tstamp' => time(),
-			'pid' => $this->extConf['storagePid'],
+			'pid' => $this->settings['storagePid'],
 			'username' => $this->remoteUser,
 			'password' => md5(t3lib_div::shortMD5(uniqid(rand(), true))),
-			'email' => $this->getServerVar($this->extConf['mail']),
-			'name' => $this->getServerVar($this->extConf['firstName']) . ' ' . $this->getServerVar($this->extConf['lastName']),
+			'email' => $this->getServerVar($this->settings['mail']),
+			'name' => $this->getServerVar($this->settings['firstName']) . ' ' . $this->getServerVar($this->settings['lastName']),
 			'usergroup' => $this->getFEUserGroups($this->remoteUser),
 			);
 		$GLOBALS['TYPO3_DB']->exec_INSERTquery($this->authInfo['db_user']['table'], $user);
 	}
 	
 	/**
-	 * @return	boolean
+	 * Update an existing FE user
+	 *
+	 * @param string $userId
+	 * @return void
 	 */
 	protected function updateFEUser($userId) {
 		$this->writelog(255,3,3,2,	"Updating user %s!", array($this->remoteUser));
@@ -145,8 +174,8 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 			'tstamp' => time(),
 			'username' => $this->remoteUser,
 			'password' => t3lib_div::shortMD5(uniqid(rand(), true)),
-			'email' => $this->getServerVar($this->extConf['mail']),
-			'name' => $this->getServerVar($this->extConf['firstName']) . ' ' . $this->getServerVar($this->extConf['lastName']),
+			'email' => $this->getServerVar($this->settings['mail']),
+			'name' => $this->getServerVar($this->settings['firstName']) . ' ' . $this->getServerVar($this->settings['lastName']),
 			'usergroup' => $this->getFEUserGroups($this->remoteUser),
 		);
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery($this->authInfo['db_user']['table'], $where, $user);
@@ -159,19 +188,14 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	 */
 	protected function getFEUserGroups($remoteUser) {
 
-			// $remoteUser is of Syntax eventoId@phz.ch
+		// $remoteUser is of Syntax eventoId@phz.ch
 		$remoteUserParts = t3lib_div::trimExplode('@', $remoteUser);
 		$eventoId = $remoteUserParts[0];
 
 		$eventoCodeArray = $this->getEventoCodes($eventoId);
 
-		$conversionList = $this->extConf['conversionList'];
-		$conversionList = t3lib_div::trimExplode(',', $conversionList);
-		$conversionArray = array();
-		foreach ($conversionList as $conversion) {
-			$conversionParts = t3lib_div::trimExplode('=', $conversion);
-			$conversionArray[$conversionParts[0]] = $conversionParts[1];
-		}
+		// array matching Evento codes to FE user groups, in format eventoCode = feUserGroup
+		$conversionArray = $this->settings['conversion'];
 
 		$groups = array();
 		for ($i = 0; $i < count($eventoCodeArray); $i++) {
@@ -186,18 +210,25 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 		if (count($groups) > 0) {
 			return implode(",", $groups);
 		} else {
-			return $this->extConf['defaultGroupId'];
+			return $this->settings['defaultGroupId'];
 		}
 
 	}
-	
+
 	/**
+	 * Check if the authentication type is Shibboleth
+	 *
 	 * @return	boolean
 	 */
 	protected function isShibbolethLogin() {
 		return isset($_SERVER['AUTH_TYPE']) && ($_SERVER['AUTH_TYPE'] == 'shibboleth') && !empty($this->remoteUser);
 	}
-	
+
+	/**
+	 * @param $key
+	 * @param string $prefix
+	 * @return null
+	 */
 	protected function getServerVar($key, $prefix='REDIRECT_') {
 		if (isset($_SERVER[$key])) {
 			return $_SERVER[$key];
@@ -210,12 +241,12 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 				}
 			}
 		}
-		return null;
+		return NULL;
 	}
 
-
 	/**
-	 * Gets evento web codes of a user
+	 * Gets Evento web codes of a user
+	 *
 	 * @param	int		$eventoId
 	 * @return	mixed
 	 */
@@ -224,7 +255,8 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 		$params = array();
 		$params['sqlSelectStatement'] = 'SELECT * FROM dbo.qryCSTPHZ_1900_PersonenWebRollen WHERE IDPerson = ' . (int)$eventoId;
 
-		$this->webservice = t3lib_div::makeInstance('tx_t3evento_webserviceClient', $this->extConf['webserviceUrl'], $this->extConf['webservicePwd']);
+		/** @var $webservice tx_t3evento_webserviceClient */
+		$this->webservice = t3lib_div::makeInstance('tx_t3evento_webserviceClient', $this->settings['webserviceUrl'], $this->settings['webservicePwd']);
 		$data = $this->webservice->getData('Read', $params);
 		$readResult = $data->ReadResult;
 
