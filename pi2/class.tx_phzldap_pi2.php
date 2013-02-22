@@ -89,6 +89,7 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		} elseif (isset($params['tx_phzldap_pi2']['arPid']) && t3lib_utility_Math::canBeInterpretedAsInteger($params['tx_phzldap_pi2']['arPid'])) {
 			// user is logged in, but we have a link to an access restricted page --> redirect
 			$redirectLink = $this->cObj->getTypoLink_URL($params['tx_phzldap_pi2']['arPid']);
+			unset($params['tx_phzldap_pi2']['arPid']);
 			t3lib_utility_Http::redirect($redirectLink);
 		} else {
 			// user is logged in and we don't need to redirect
