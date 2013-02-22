@@ -103,16 +103,22 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	 * @return bool|mixed
 	 */
 	public function getUser() {
+
 		$user = FALSE;
 
 		if ($this->login['status']=='login' && $this->isShibbolethLogin() && empty($this->login['uname'])) {
-			$user = $this->fetchUserRecord($this->remoteUser);
+
+			// $remoteUser is of Syntax eventoId@phz.ch
+			$remoteUserParts = t3lib_div::trimExplode('@', $this->remoteUser);
+			$eventoId = $remoteUserParts[0];
+
+			$user = $this->fetchUserRecord($eventoId);
 			if (!is_array($user) || empty($user)) {
-				$this->importFEUser();
+				$this->importFEUser($eventoId);
 			} else {
-				$this->updateFEUser($user['uid']);
+				$this->updateFEUser($user['uid'], $eventoId);
 			}
-			$user = $this->fetchUserRecord($this->remoteUser);
+			$user = $this->fetchUserRecord($eventoId);
 
 		}
 
@@ -145,11 +151,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	/**
 	 *
 	 */
-	protected function importFEUser() {
-
-		// $remoteUser is of Syntax eventoId@phz.ch
-		$remoteUserParts = t3lib_div::trimExplode('@', $this->remoteUser);
-		$eventoId = $remoteUserParts[0];
+	protected function importFEUser($eventoId) {
 
 		$this->writelog(255,3,3,2, "Importing user %s!", array($eventoId));
 
@@ -160,7 +162,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 			'password' => md5(t3lib_div::shortMD5(uniqid(rand(), true))),
 			'email' => $this->getServerVar($this->settings['mail']),
 			'name' => $this->getServerVar($this->settings['firstName']) . ' ' . $this->getServerVar($this->settings['lastName']),
-			'usergroup' => $this->getFEUserGroups($this->remoteUser),
+			'usergroup' => $this->getFEUserGroups($eventoId),
 			);
 		$GLOBALS['TYPO3_DB']->exec_INSERTquery($this->authInfo['db_user']['table'], $user);
 	}
@@ -169,13 +171,10 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	 * Update an existing FE user
 	 *
 	 * @param string $userId
+	 * @param string $eventoId
 	 * @return void
 	 */
-	protected function updateFEUser($userId) {
-		// $remoteUser is of Syntax eventoId@phz.ch
-		$remoteUserParts = t3lib_div::trimExplode('@', $this->remoteUser);
-		$eventoId = $remoteUserParts[0];
-
+	protected function updateFEUser($userId, $eventoId) {
 		$this->writelog(255,3,3,2,	"Updating user %s!", array($eventoId));
 
 		$where = "uid = " . $userId;
@@ -185,7 +184,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 			'password' => t3lib_div::shortMD5(uniqid(rand(), true)),
 			'email' => $this->getServerVar($this->settings['mail']),
 			'name' => $this->getServerVar($this->settings['firstName']) . ' ' . $this->getServerVar($this->settings['lastName']),
-			'usergroup' => $this->getFEUserGroups($this->remoteUser),
+			'usergroup' => $this->getFEUserGroups($eventoId),
 		);
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery($this->authInfo['db_user']['table'], $where, $user);
 	}
@@ -195,11 +194,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	 *
 	 * @return string CSV list of usergroups based on Evento codes
 	 */
-	protected function getFEUserGroups($remoteUser) {
-
-		// $remoteUser is of Syntax eventoId@phz.ch
-		$remoteUserParts = t3lib_div::trimExplode('@', $remoteUser);
-		$eventoId = $remoteUserParts[0];
+	protected function getFEUserGroups($eventoId) {
 
 		$eventoCodeArray = $this->getEventoCodes($eventoId);
 
