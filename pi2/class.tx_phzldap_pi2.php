@@ -2,7 +2,7 @@
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2012 Lorenz Ulrich <lorenz.ulrich@phz.ch>
+*  (c) 2012-2013 Lorenz Ulrich <lorenz.ulrich@phz.ch>
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -60,12 +60,11 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 
 		// Check configuration
 		if (!isset($conf['folder_uid'])) return $this->pi_getLL('no_folder_uid_set');
-		// TODO check for shibboleth typoscript
-		// shibbolethLoginHandler = /Shibboleth.sso/Login?entityID=https%3A%2F%2Faai-demo-idp.switch.ch%2Fidp%2Fshibboleth
-		// shibbolethLogoutHandler = /Shibboleth.sso/Logout
+		if (!isset($conf['shibbolethLoginHandler'])) return 'TypoScript: shibbolethLoginHandler not set';
+		if (!isset($conf['shibbolethLogoutHandler'])) return 'TypoScript: shibbolethLogoutHandler not set';
+		if (!isset($conf['shibbolethLoginHandler'])) return 'TypoScript: shibbolethLogoutHandler not set';
 
-			// Get page uid for redirection
-			// Flexform value has priority, after that the TS value is beeing used
+		// Flexform value has priority, after that the TS value is beeing used
 		$templateFile = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'templateFile', 'general');
 		if (empty($templateFile)) {
 			$this->template = $this->cObj->fileResource($this->conf['templateFile']);
@@ -74,33 +73,13 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		}
 		if (empty($this->template)) return 'no template set';
 
-			// success uid from FlexForm or TypoScript
-		$successUid = (int) $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'successUid', 'general');
-		if (!isset($this->successUid) or !t3lib_utility_Math::canBeInterpretedAsInteger($this->successUid)) {
-			$successUid = (int) $conf['success_uid'];
-		}
+		// get target URL for login
+		$this->setTargetUrl($conf);
 
-			// generate redirect url
-		if (!empty($successUid)) {
-			// we need to redirect to a defined page
-			// TODO
-		} else {
-				// we need to reload the current page
-			$params = t3lib_div::_GET();
-			unset($params['logintype']);
-			unset($params[$this->prefixId]);
-			$this->successRedirectUrl = $this->pi_linkTP_keepPIvars_url($params, $cache=0, $clearAnyway=0, $altPageId=0);
-		}
-
-		//t3lib_utility_Debug::debug($conf, 'conf');
-		//t3lib_utility_Debug::debug($_SERVER, 'SERVER');
-
-			// is the user logged in?
+		// is the user logged in?
 		$this->userIsLoggedIn = $GLOBALS['TSFE']->loginUser;
 
-		//t3lib_utility_Debug::debug($this->userIsLoggedIn, 'userIsLoggedIn');
-
-
+		// display login link or login success depending on the login status
 		if (!$this->userIsLoggedIn) {
 			$content = $this->renderLoginLink('');
 		} else {
@@ -108,6 +87,41 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		}
 
 		return $content;
+	}
+
+	/**
+	 * Determines whether to redirect the user after successful login and sends header information
+	 *
+	 * @param array $conf
+	 * @return string
+	 */
+	public function setTargetUrl($conf) {
+
+		// success uid from FlexForm or TypoScript
+		// ev. TODO allow settings successUid from FlexForm and/or TypoScript
+		/*$successUid = (int) $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'successUid', 'general');
+		if (!isset($this->successUid) or !t3lib_utility_Math::canBeInterpretedAsInteger($this->successUid)) {
+			$successUid = (int) $conf['success_uid'];
+		}*/
+
+		// all GET parameters (not only the namespaced ones)
+		$params = t3lib_div::_GET();
+
+		if (isset($params['redirectUid']) && t3lib_utility_Math::canBeInterpretedAsInteger($params['redirectUid'])) {
+			// A redirect UID is set, so we must redirect to this page
+			$redirectUid = $params['redirectUid'];
+			unset($params['logintype']);
+			unset($params[$this->prefixId]);
+			unset($params['id']);
+			unset($params['redirectUid']);
+			$this->successRedirectUrl = $this->pi_linkTP_keepPIvars_url($params, $cache=0, $clearAnyway=0, $redirectUid);
+		} else {
+			// we need to reload the current page
+			unset($params['logintype']);
+			unset($params[$this->prefixId]);
+			$this->successRedirectUrl = $this->pi_linkTP_keepPIvars_url($params, $cache=0, $clearAnyway=0, $altPageId=0);
+		}
+
 	}
 
 	/**
@@ -123,7 +137,6 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		$feUserPid .= !stristr($this->successRedirectUrl, '?') ? '?' : '&';
 		$feUserPid .= 'pid=' . (int)$this->conf['folder_uid'];
 		$loginHandlerUrl = $this->conf['sslHost'] . $this->conf['shibbolethLoginHandler'] . '&target=' . urlencode($this->successRedirectUrl . $feUserPid);
-		//t3lib_utility_Debug::debug($loginHandlerUrl,'loginHandlerUrl');
 		$marker['###LOGINHANDLERURL###'] = $loginHandlerUrl;
 
 		return $this->cObj->substituteMarkerArray($form, $marker);		
@@ -162,34 +175,6 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 				$GLOBALS['TSFE']->additionalHeaderData[$key] = $headerParts;
 			}
 		}
-	}
-
-	/**
-	 * Checks an Evento verification code
-	 * @param	int		$eventoId
-	 * @param	string	$eventoVerificationCode
-	 * @return	mixed
-	 */
-	public function checkAndGetEventoUserInformation($eventoId, $eventoVerificationCode) {
-
-		$params = array();
-		$params['sqlSelectStatement'] = 'SELECT * FROM dbo.qryCstPHZ_1900_TempLogins WHERE IDPerson = ' . $eventoId . ' AND VerificationCode = \'' . $eventoVerificationCode . '\'';
-
-		$this->webservice = t3lib_div::makeInstance('tx_t3evento_webserviceClient',$this->conf['webserviceUrl'],$this->conf['webservicePwd']);
-		$data = $this->webservice->getData('Read', $params);
-		$readResult = $data->ReadResult;
-
-		if (count((array)$readResult->Records) === 0) {
-				// Return if there are no results
-			return false;
-		} else {
-				// Return User information if login is valid
-			$columns = $readResult->Columns;
-			$record = $readResult->Records->Record;
-			$eventoUserInformation = tx_t3evento_helper::getColumnValueArray($record,$columns,$readResult);
-			return $eventoUserInformation;
-		}
-
 	}
 
 }
