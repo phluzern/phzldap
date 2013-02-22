@@ -146,12 +146,17 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	 *
 	 */
 	protected function importFEUser() {
-		$this->writelog(255,3,3,2, "Importing user %s!", array($this->remoteUser));
+
+		// $remoteUser is of Syntax eventoId@phz.ch
+		$remoteUserParts = t3lib_div::trimExplode('@', $this->remoteUser);
+		$eventoId = $remoteUserParts[0];
+
+		$this->writelog(255,3,3,2, "Importing user %s!", array($eventoId));
 
 		$user = array('crdate' => time(),
 			'tstamp' => time(),
 			'pid' => $this->settings['storagePid'],
-			'username' => $this->remoteUser,
+			'username' => $eventoId,
 			'password' => md5(t3lib_div::shortMD5(uniqid(rand(), true))),
 			'email' => $this->getServerVar($this->settings['mail']),
 			'name' => $this->getServerVar($this->settings['firstName']) . ' ' . $this->getServerVar($this->settings['lastName']),
@@ -167,12 +172,16 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	 * @return void
 	 */
 	protected function updateFEUser($userId) {
-		$this->writelog(255,3,3,2,	"Updating user %s!", array($this->remoteUser));
+		// $remoteUser is of Syntax eventoId@phz.ch
+		$remoteUserParts = t3lib_div::trimExplode('@', $this->remoteUser);
+		$eventoId = $remoteUserParts[0];
+
+		$this->writelog(255,3,3,2,	"Updating user %s!", array($eventoId));
 
 		$where = "uid = " . $userId;
 		$user = array(
 			'tstamp' => time(),
-			'username' => $this->remoteUser,
+			'username' => $eventoId,
 			'password' => t3lib_div::shortMD5(uniqid(rand(), true)),
 			'email' => $this->getServerVar($this->settings['mail']),
 			'name' => $this->getServerVar($this->settings['firstName']) . ' ' . $this->getServerVar($this->settings['lastName']),
