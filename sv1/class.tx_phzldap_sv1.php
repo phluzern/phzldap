@@ -139,9 +139,13 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	public function authUser($user) {
 		$OK = 100;
 
+		// $remoteUser is of Syntax eventoId@phz.ch
+		$remoteUserParts = t3lib_div::trimExplode('@', $this->remoteUser);
+		$eventoId = $remoteUserParts[0];
+
 		if (($this->authInfo['loginType'] == 'FE') && !empty($this->login['uname'])) {
 			$OK = 100;
-		} else if ($this->isShibbolethLogin() && !empty($user) && ($this->remoteUser == $user[$this->authInfo['db_user']['username_column']])) {
+		} else if ($this->isShibbolethLogin() && !empty($user) && ($eventoId == $user[$this->authInfo['db_user']['username_column']])) {
 			$OK = 200;
 		}
 		
