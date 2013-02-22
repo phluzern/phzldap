@@ -56,10 +56,10 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 	/**
 	 * Initialize authentication service
 	 *
-	 * @param	string		Subtype of the service which is used to call the service.
-	 * @param	array		Submitted login form data
-	 * @param	array		Information array. Holds submitted form data etc.
-	 * @param	object		Parent object
+	 * @param	string		$mode Subtype of the service which is used to call the service.
+	 * @param	array		$loginData Submitted login form data
+	 * @param	array		$authInfo Information array. Holds submitted form data etc.
+	 * @param	object		$pObj Parent object
 	 * @return	mixed
 	 */
 	public function initAuth($mode, $loginData, $authInfo, $pObj) {
@@ -72,6 +72,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 		// if no PID is set, this is not a login attempt
 		$pid = t3lib_div::_GP('pid');
 		if (empty($this->login['uname']) && !empty($pid)) {
+
 			/* Initialize TypoScript setup in TSFE */
 			$GLOBALS['TSFE']->determineId();
 			$GLOBALS['TSFE']->getCompressedTCarray();
@@ -87,6 +88,7 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 				'phzldap',
 				'pi2'
 			);
+
 
 			/* If remote user identifier is not defined, switch to standard */
 			if (empty($this->settings['remoteUser'])) {
