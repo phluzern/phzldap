@@ -63,6 +63,7 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		if (!isset($conf['shibbolethLoginHandler'])) return 'TypoScript: shibbolethLoginHandler not set';
 		if (!isset($conf['shibbolethLogoutHandler'])) return 'TypoScript: shibbolethLogoutHandler not set';
 		if (!isset($conf['shibbolethLoginHandler'])) return 'TypoScript: shibbolethLogoutHandler not set';
+		if (!isset($conf['logoutTargetPid'])) return 'TypoScript: logoutTargetPid not set';
 
 		// Flexform value has priority, after that the TS value is beeing used
 		$templateFile = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'templateFile', 'general');
@@ -164,7 +165,7 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		$displayName = $GLOBALS['TSFE']->fe_user->user['name'];
 		$marker['###DISPLAY_NAME###'] = $displayName;
 
-		$this->conf['linkConfig.']['parameter'] = $GLOBALS['TSFE']->id;
+		$this->conf['linkConfig.']['parameter'] = $this->conf['logoutTargetPid'];
 		$this->conf['linkConfig.']['additionalParams'] = '&logintype=logout';
 		$marker['###LOGOUT_URL###'] = htmlspecialchars($this->cObj->typolink_url($this->conf['linkConfig.']));;
 
