@@ -213,6 +213,8 @@ class tx_phzldap_pi1 extends tx_t3evento_pi5 {
 		if (!empty($redirectLink)) {
 			$redirectUrlResult = $redirectLink;
 		} else {
+			unset($params['id']);
+			unset($params[$this->prefixId]['id']);
 			$redirectUrlResult = $this->pi_getPageLink($this->successUid, null, $params);
 		}
 
