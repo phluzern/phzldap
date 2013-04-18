@@ -88,7 +88,10 @@ class tx_phzldap_pi3 extends tx_t3evento_pi5 {
 
 			$eventoId = (int)tx_t3evento_helper::decodeString($encodedEventoId);
 				// early exit if evt was malformed
-			if (empty($eventoId)) { exit; }
+			if (empty($eventoId)) {
+				$content = $this->renderLoginForm($this->pi_getLL('message_create_or_update_user_from_evento_failed'));
+				return $this->pi_wrapInBaseClass($content);
+			}
 			$eventoVerificationCode = mysql_real_escape_string($eventoVerificationCode);
 
 			$checkAndGetEventoUserInformation = $this->checkAndGetEventoUserInformation($eventoId, $eventoVerificationCode);
