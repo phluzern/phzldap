@@ -169,7 +169,7 @@ class tx_phzldap_pi1 extends tx_t3evento_pi5 {
 							if (tx_phzldap_helper::createOrUpdateFeUser($password, $attrs, $conf)) {
 								if ($this->loginUser($attrs['eventoId'], $password)) {
 										$redirect_url = $this->getRedirectAfterLoginUrl($conf);
-										header('Location: ' . t3lib_div::locationHeaderUrl($redirect_url));
+										t3lib_utility_Http::redirect($redirect_url);
 										exit;
 								} else {
 									$content = $this->renderLoginForm($this->pi_getLL('message_typo3_login_failed'));
@@ -201,31 +201,17 @@ class tx_phzldap_pi1 extends tx_t3evento_pi5 {
 	public function getRedirectAfterLoginUrl($conf) {
 
 		// Get all GET parameters to keep them for the new, redirected URL
-		$params = t3lib_div::_GET($this->prefixId);
+		$params = t3lib_div::_GET();
 
-		// If redirect_url is set by GET, decode it
-		// Todo: redirect_url muss validiert werden, sonst ist Umleitung auf externe Seiten möglich!
-		$redirectUrl = t3lib_div::_GET('redirect_url');
-		if (isset($redirectUrl)) {
-			$redirectUrl = t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST') . '/' . urldecode($redirectUrl);
-		}
-		$redirectUrlFromParams = $params['redirect_url'];
-		if (isset($redirectUrlFromParams)) {
-			$redirectUrl = t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST') . '/' . urldecode($redirectUrlFromParams);
+		if (isset($params['arPid']) && t3lib_utility_Math::canBeInterpretedAsInteger($params['arPid'])) {
+			$redirectLink = $this->cObj->getTypoLink_URL($params['arPid']);
+			unset($params['arPid']);
 		}
 
-		// Try to get the redirected page uid by the parameter defined
-		// in the TS setup
-		$uid = $params[$conf['redirectParameter']];
-		// Test if uid is not empty and an int (> 0)
-		if (!empty($uid) && t3lib_div::testInt($uid)) $this->successUid = $uid;
-		// Clear some values from the parameter array
-		unset($params['id']);
-		unset($params[$conf['redirectParameter']]);
 		// Generate the new URL and do a redirect with the help of HTTP
 		// Location directive, redirect_url from GET has priority over FlexForm/TS
-		if (!empty($redirectUrl)) {
-			$redirectUrlResult = $redirectUrl;
+		if (!empty($redirectLink)) {
+			$redirectUrlResult = $redirectLink;
 		} else {
 			$redirectUrlResult = $this->pi_getPageLink($this->successUid, null, $params);
 		}
