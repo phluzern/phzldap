@@ -127,11 +127,12 @@ class tx_phzldap_pi1 extends tx_t3evento_pi5 {
 				if (tx_phzldap_helper::createOrUpdateFeUser($checkAndGetEventoUserInformation['VerificationCode'], $attributes, $conf)) {
 					if ($this->loginUser($checkAndGetEventoUserInformation['IDPerson'], $checkAndGetEventoUserInformation['VerificationCode'])) {
 
-						$redirect_url = $this->getRedirectAfterLoginUrl($conf);
-						//$location = t3lib_div::locationHeaderUrl($redirect_url . $userLoggedOutParameter);
-						$location = t3lib_div::locationHeaderUrl($redirect_url);
-						header('Location: ' . $location);
-						exit;
+						if (isset($params['tx_phzldap_pi1']['arPid']) && t3lib_utility_Math::canBeInterpretedAsInteger($params['tx_phzldap_pi1']['arPid'])) {
+							// user is logged in, but we have a link to an access restricted page --> redirect
+							$redirectLink = $this->cObj->getTypoLink_URL($params['tx_phzldap_pi1']['arPid']);
+							unset($params['tx_phzldap_pi1']['arPid']);
+							t3lib_utility_Http::redirect($redirectLink);
+						}
 
 					} else {
 						$content = $this->renderLoginForm($this->pi_getLL('message_typo3_login_failed'));
