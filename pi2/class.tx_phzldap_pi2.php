@@ -108,13 +108,6 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 	 */
 	public function setTargetUrl($conf) {
 
-		// success uid from FlexForm or TypoScript
-		// ev. TODO allow settings successUid from FlexForm and/or TypoScript
-		/*$successUid = (int) $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'successUid', 'general');
-		if (!isset($this->successUid) or !t3lib_utility_Math::canBeInterpretedAsInteger($this->successUid)) {
-			$successUid = (int) $conf['success_uid'];
-		}*/
-
 		// all GET parameters (not only the namespaced ones)
 		$params = t3lib_div::_GET();
 
@@ -126,7 +119,19 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 			unset($params['id']);
 			unset($params['redirectUid']);
 			$this->successRedirectUrl = $this->pi_linkTP_keepPIvars_url($params, $cache=0, $clearAnyway=0, $redirectUid);
-		} else {
+		}
+
+		$successUid = (int) $conf['success_uid'];
+		if (!empty($successUid)) {
+			// We use the TypoScript setting for the redirect
+			$redirectUid = $successUid;
+			unset($params['logintype']);
+			unset($params[$this->prefixId]);
+			unset($params['id']);
+			$this->successRedirectUrl = $this->pi_linkTP_keepPIvars_url($params, $cache=0, $clearAnyway=0, $redirectUid);
+		}
+
+		if (empty($this->successRedirectUrl)) {
 			// we need to reload the current page
 			unset($params['logintype']);
 			unset($params[$this->prefixId]);
