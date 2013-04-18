@@ -201,7 +201,7 @@ class tx_phzldap_pi1 extends tx_t3evento_pi5 {
 	public function getRedirectAfterLoginUrl($conf) {
 
 		// Get all GET parameters to keep them for the new, redirected URL
-		$params = t3lib_div::_GET();
+		$params = t3lib_div::_GET($this->prefixId);
 
 		if (isset($params['arPid']) && t3lib_utility_Math::canBeInterpretedAsInteger($params['arPid'])) {
 			$redirectLink = $this->cObj->getTypoLink_URL($params['arPid']);
