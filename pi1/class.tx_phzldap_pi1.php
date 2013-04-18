@@ -55,6 +55,9 @@ class tx_phzldap_pi1 extends tx_t3evento_pi5 {
 		$this->pi_initPIflexForm();
 		$content = '';
 
+		// Get all GET parameters
+		$params = t3lib_div::_GET();
+
 		// Check configuration
 		if (!isset($conf['hostname'])) return $this->pi_getLL('no_hostname_set');
 		if (!isset($conf['basedn'])) return $this->pi_getLL('no_basedn_set');
@@ -127,10 +130,10 @@ class tx_phzldap_pi1 extends tx_t3evento_pi5 {
 				if (tx_phzldap_helper::createOrUpdateFeUser($checkAndGetEventoUserInformation['VerificationCode'], $attributes, $conf)) {
 					if ($this->loginUser($checkAndGetEventoUserInformation['IDPerson'], $checkAndGetEventoUserInformation['VerificationCode'])) {
 
-						if (isset($params['tx_phzldap_pi1']['arPid']) && t3lib_utility_Math::canBeInterpretedAsInteger($params['tx_phzldap_pi1']['arPid'])) {
+						if (isset($params['arPid']) && t3lib_utility_Math::canBeInterpretedAsInteger($params['arPid'])) {
 							// user is logged in, but we have a link to an access restricted page --> redirect
-							$redirectLink = $this->cObj->getTypoLink_URL($params['tx_phzldap_pi1']['arPid']);
-							unset($params['tx_phzldap_pi1']['arPid']);
+							$redirectLink = $this->cObj->getTypoLink_URL($params['arPid']);
+							unset($params['arPid']);
 							t3lib_utility_Http::redirect($redirectLink);
 						}
 
