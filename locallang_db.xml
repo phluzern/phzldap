@@ -13,7 +13,7 @@
 		<languageKey index="de" type="array">
 			<label index="tt_content.list_type_pi1">FE Login Box</label>
 			<label index="tt_content.list_type_pi2">Shibboleth Frontend Login</label>
-			<label index="tt_content.list_type_pi2">Login Link Login</label>
+			<label index="tt_content.list_type_pi3">Login Link Login</label>
 		</languageKey>
 	</data>
 </T3locallang>
