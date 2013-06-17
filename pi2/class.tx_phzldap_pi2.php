@@ -118,7 +118,7 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 			unset($params[$this->prefixId]);
 			unset($params['id']);
 			unset($params['redirectUid']);
-			$this->successRedirectUrl = $this->pi_linkTP_keepPIvars_url($params, $cache=0, $clearAnyway=0, $redirectUid);
+			$this->successRedirectUrl = $this->pi_getPageLink($redirectUid, '', $params);
 		}
 
 		$successUid = (int) $conf['success_uid'];
