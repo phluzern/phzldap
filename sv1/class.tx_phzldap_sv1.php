@@ -167,8 +167,10 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 			'username' => $eventoId,
 			'password' => md5(t3lib_div::shortMD5(uniqid(rand(), true))),
 			'email' => $this->getServerVar($this->settings['mail']),
-			'name' => $this->getServerVar($this->settings['firstName']) . ' ' . $this->getServerVar($this->settings['lastName']),
 			'usergroup' => $this->getFEUserGroups($eventoId),
+			'first_name' => $this->getServerVar($this->settings['firstName']),
+			'last_name' => $this->getServerVar($this->settings['lastName']),
+			'name' => $this->getServerVar($this->settings['firstName']) . ' ' . $this->getServerVar($this->settings['lastName']),
 			);
 		$GLOBALS['TYPO3_DB']->exec_INSERTquery($this->authInfo['db_user']['table'], $user);
 	}
@@ -189,6 +191,8 @@ class tx_phzldap_sv1 extends tx_sv_authbase {
 			'username' => $eventoId,
 			'password' => t3lib_div::shortMD5(uniqid(rand(), true)),
 			'email' => $this->getServerVar($this->settings['mail']),
+			'first_name' => $this->getServerVar($this->settings['firstName']),
+			'last_name' => $this->getServerVar($this->settings['lastName']),
 			'name' => $this->getServerVar($this->settings['firstName']) . ' ' . $this->getServerVar($this->settings['lastName']),
 			'usergroup' => $this->getFEUserGroups($eventoId),
 		);
