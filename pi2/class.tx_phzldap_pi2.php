@@ -152,7 +152,7 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		$feUserPid = '';
 		$feUserPid .= !stristr($this->successRedirectUrl, '?') ? '?' : '&';
 		$feUserPid .= 'pid=' . (int)$this->conf['folder_uid'];
-		$loginHandlerUrl = $this->conf['sslHost'] . $this->conf['shibbolethLoginHandler'] . '&target=' . urlencode($this->successRedirectUrl . $feUserPid);
+		$loginHandlerUrl = $this->conf['sslHost'] . $this->conf['shibbolethLoginHandler'] . '&amp;target=' . urlencode($this->successRedirectUrl . $feUserPid);
 		$marker['###LOGINHANDLERURL###'] = $loginHandlerUrl;
 
 		return $this->cObj->substituteMarkerArray($form, $marker);		
@@ -171,7 +171,7 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		$marker['###DISPLAY_NAME###'] = $displayName;
 
 		$this->conf['linkConfig.']['parameter'] = $this->conf['logoutTargetPid'];
-		$this->conf['linkConfig.']['additionalParams'] = '&logintype=logout';
+		$this->conf['linkConfig.']['additionalParams'] = '&amp;logintype=logout';
 		$marker['###LOGOUT_URL###'] = htmlspecialchars($this->cObj->typolink_url($this->conf['linkConfig.']));;
 
 		return $this->cObj->substituteMarkerArray($form, $marker);
