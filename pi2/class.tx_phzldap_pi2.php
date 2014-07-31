@@ -22,10 +22,7 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once(PATH_tslib . 'class.tslib_pibase.php');
-require_once(t3lib_extMgm::extPath('phzldap') . 'includes/class.tx_phzldap_helper.php');
-require_once(t3lib_extMgm::extPath('t3evento') . 'pi5/class.tx_t3evento_pi5.php');
-
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Plugin 'Shibboleth Login' for the 'phzldap' extension.
@@ -34,7 +31,7 @@ require_once(t3lib_extMgm::extPath('t3evento') . 'pi5/class.tx_t3evento_pi5.php'
  * @package	TYPO3
  * @subpackage	tx_phzldap
  */
-class tx_phzldap_pi2 extends tx_t3evento_pi5 {
+class tx_phzldap_pi2 extends \tx_t3evento_pi5 {
 	var $prefixId      = 'tx_phzldap_pi2';		// Same as class name
 	var $scriptRelPath = 'pi2/class.tx_phzldap_pi2.php';	// Path to this script relative to the extension dir.
 	var $extKey        = 'phzldap';	// The extension key.
@@ -70,7 +67,7 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		if (empty($templateFile)) {
 			$this->template = $this->cObj->fileResource($this->conf['templateFile']);
 		} else {
-			$this->template = t3lib_div::getURL($templateFile);
+			$this->template = GeneralUtility::getURL($templateFile);
 		}
 		if (empty($this->template)) return 'no template set';
 
@@ -78,7 +75,7 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		$this->setTargetUrl($conf);
 
 		// URL parameters
-		$params = t3lib_div::_GET();
+		$params = GeneralUtility::_GET();
 
 		// is the user logged in?
 		$this->userIsLoggedIn = $GLOBALS['TSFE']->loginUser;
@@ -87,7 +84,7 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 		if (!$this->userIsLoggedIn) {
 			// user is not logged in, display login link
 			$content = $this->renderLoginLink('');
-		} elseif (isset($params['tx_phzldap_pi2']['arPid']) && t3lib_utility_Math::canBeInterpretedAsInteger($params['tx_phzldap_pi2']['arPid'])) {
+		} elseif (isset($params['tx_phzldap_pi2']['arPid']) && \TYPO3\CMS\Core\Utility\MathUtility::canBeInterpretedAsInteger($params['tx_phzldap_pi2']['arPid'])) {
 			// user is logged in, but we have a link to an access restricted page --> redirect
 			$redirectLink = $this->cObj->getTypoLink_URL($params['tx_phzldap_pi2']['arPid']);
 			unset($params['tx_phzldap_pi2']['arPid']);
@@ -109,9 +106,9 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 	public function setTargetUrl($conf) {
 
 		// all GET parameters (not only the namespaced ones)
-		$params = t3lib_div::_GET();
+		$params = GeneralUtility::_GET();
 
-		if (isset($params['redirectUid']) && t3lib_utility_Math::canBeInterpretedAsInteger($params['redirectUid'])) {
+		if (isset($params['redirectUid']) && \TYPO3\CMS\Core\Utility\MathUtility::canBeInterpretedAsInteger($params['redirectUid'])) {
 			// A redirect UID is set, so we must redirect to this page
 			$redirectUid = $params['redirectUid'];
 			unset($params['logintype']);
@@ -187,16 +184,12 @@ class tx_phzldap_pi2 extends tx_t3evento_pi5 {
 			if ($headerParts) {
 				$headerParts = $this->cObj->substituteMarker(
 					$headerParts, '###SITE_REL_PATH###',
-					t3lib_extMgm::siteRelPath($this->extKey));
+					\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath($this->extKey));
 				$GLOBALS['TSFE']->additionalHeaderData[$key] = $headerParts;
 			}
 		}
 	}
 
-}
-
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/phzldap/pi2/class.tx_phzldap_pi2.php'])	{
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/phzldap/pi2/class.tx_phzldap_pi2.php']);
 }
 
 ?>

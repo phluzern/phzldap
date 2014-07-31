@@ -22,13 +22,6 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
-/**
- * [CLASS/FUNCTION INDEX of SCRIPT]
- *
- * Hint: use extdeveval to insert/update function index above.
- * 
- * 
- */
 
 class tx_phzldap_helper {
 	
@@ -123,7 +116,7 @@ class tx_phzldap_helper {
 		if ($GLOBALS['TYPO3_DB']->sql_fetch_assoc($sql) == true)
         {
 			$values = array(
-	     		'password'    => t3lib_div::md5int($password),
+	     		'password'    => \TYPO3\CMS\Core\Utility\GeneralUtility::md5int($password),
 				'name'        => $attributes['cn'],
 				'first_name'        => $attributes['first_name'],
 				'last_name'        => $attributes['last_name'],
@@ -137,7 +130,7 @@ class tx_phzldap_helper {
         } else {
 			$values = array(
 				'username'    => $username,
-	     		'password'    => t3lib_div::md5int($password),
+	     		'password'    => \TYPO3\CMS\Core\Utility\GeneralUtility::md5int($password),
 				'name'        => $attributes['cn'],
 				'first_name'        => $attributes['first_name'],
 				'last_name'        => $attributes['last_name'],

@@ -22,10 +22,7 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once(PATH_tslib . 'class.tslib_pibase.php');
-require_once(t3lib_extMgm::extPath('phzldap') . 'includes/class.tx_phzldap_helper.php');
-require_once(t3lib_extMgm::extPath('t3evento') . 'pi5/class.tx_t3evento_pi5.php');
-
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Plugin 'Login Link Login' for the 'phzldap' extension.
@@ -34,7 +31,7 @@ require_once(t3lib_extMgm::extPath('t3evento') . 'pi5/class.tx_t3evento_pi5.php'
  * @package	TYPO3
  * @subpackage	tx_phzldap
  */
-class tx_phzldap_pi3 extends tx_t3evento_pi5 {
+class tx_phzldap_pi3 extends \tx_t3evento_pi5 {
 	var $prefixId      = 'tx_phzldap_pi3';		// Same as class name
 	var $scriptRelPath = 'pi3/class.tx_phzldap_pi3.php';	// Path to this script relative to the extension dir.
 	var $extKey        = 'phzldap';	// The extension key.
@@ -56,7 +53,7 @@ class tx_phzldap_pi3 extends tx_t3evento_pi5 {
 		$content = '';
 
 		// Get all GET parameters
-		$params = t3lib_div::_GET();
+		$params = GeneralUtility::_GET();
 
 		// Check configuration
 		if (!isset($conf['folder_uid'])) return $this->pi_getLL('no_folder_uid_set');
@@ -73,7 +70,7 @@ class tx_phzldap_pi3 extends tx_t3evento_pi5 {
 		} else {
 			// TODO: No idea why fileResource does not work in this context
 			// $this->template = $this->cObj->fileResource($templateFile);
-			$this->template = t3lib_div::getURL($templateFile);
+			$this->template = GeneralUtility::getURL($templateFile);
 		}
 		if (empty($this->template)) return $this->pi_getLL('no_template_set');
 		
@@ -81,8 +78,8 @@ class tx_phzldap_pi3 extends tx_t3evento_pi5 {
 		 * Evento-Login with login link
 		 * As long as the user doesn't have a password, he can log in with a link sent to him
 		 */
-		$encodedEventoId = t3lib_div::_GET('evt');
-		$eventoVerificationCode = t3lib_div::_GET('evc');
+		$encodedEventoId = GeneralUtility::_GET('evt');
+		$eventoVerificationCode = GeneralUtility::_GET('evc');
 
 		if (empty($submit) && !empty($encodedEventoId) && !empty($eventoVerificationCode)) {
 
@@ -97,13 +94,13 @@ class tx_phzldap_pi3 extends tx_t3evento_pi5 {
 			$checkAndGetEventoUserInformation = $this->checkAndGetEventoUserInformation($eventoId, $eventoVerificationCode);
 			if($checkAndGetEventoUserInformation !== false) {
 
-				$userGroupArray = t3lib_div::trimExplode(',',$checkAndGetEventoUserInformation['PersonenCode']);
+				$userGroupArray = GeneralUtility::trimExplode(',',$checkAndGetEventoUserInformation['PersonenCode']);
 				$userGroupArray['count'] = count($userGroupArray);
 
 				$attributes = array (
 					'username' => $checkAndGetEventoUserInformation['IDPerson'],
 					'eventoId' => $checkAndGetEventoUserInformation['IDPerson'],
-					'password' => t3lib_div::md5int($checkAndGetEventoUserInformation['VerificationCode']),
+					'password' => GeneralUtility::md5int($checkAndGetEventoUserInformation['VerificationCode']),
 					'cn' => $checkAndGetEventoUserInformation['PersonVorname'] . ' ' . $checkAndGetEventoUserInformation['PersonNachname'],
 					'first_name' => $checkAndGetEventoUserInformation['PersonVorname'],
 					'last_name' => $checkAndGetEventoUserInformation['PersonNachname'],
@@ -116,11 +113,11 @@ class tx_phzldap_pi3 extends tx_t3evento_pi5 {
 				if (tx_phzldap_helper::createOrUpdateFeUser($checkAndGetEventoUserInformation['VerificationCode'], $attributes, $conf)) {
 					if ($this->loginUser($checkAndGetEventoUserInformation['IDPerson'], $checkAndGetEventoUserInformation['VerificationCode'])) {
 
-						if (isset($params['arPid']) && t3lib_utility_Math::canBeInterpretedAsInteger($params['arPid'])) {
+						if (isset($params['arPid']) && \TYPO3\CMS\Core\Utility\MathUtility::canBeInterpretedAsInteger($params['arPid'])) {
 							// user is logged in, but we have a link to an access restricted page --> redirect
 							$redirectLink = $this->cObj->getTypoLink_URL($params['arPid']);
 							unset($params['arPid']);
-							t3lib_utility_Http::redirect($redirectLink);
+							\TYPO3\CMS\Core\Utility\HttpUtility::redirect($redirectLink);
 						}
 
 					} else {
@@ -148,9 +145,9 @@ class tx_phzldap_pi3 extends tx_t3evento_pi5 {
 		$loginData = array();
 		$loginData['uname'] = $username;
 			// TYPO3 4.5
-		$loginData['uident'] = t3lib_div::md5int($password);
+		$loginData['uident'] = GeneralUtility::md5int($password);
 			// TYPO3 4.7
-		$loginData['uident_text'] = t3lib_div::md5int($password);
+		$loginData['uident_text'] = GeneralUtility::md5int($password);
 		$loginData['status'] = 'login';
 		
 		$GLOBALS['TSFE']->fe_user->checkPid = 0;
@@ -190,7 +187,7 @@ class tx_phzldap_pi3 extends tx_t3evento_pi5 {
 		$params = array();
 		$params['sqlSelectStatement'] = 'SELECT * FROM dbo.qryCstPHZ_1900_TempLogins WHERE IDPerson = ' . $eventoId . ' AND VerificationCode = \'' . $eventoVerificationCode . '\'';
 
-		$this->webservice = t3lib_div::makeInstance('tx_t3evento_webserviceClient',$this->conf['webserviceUrl'],$this->conf['webservicePwd']);
+		$this->webservice = GeneralUtility::makeInstance('tx_t3evento_webserviceClient',$this->conf['webserviceUrl'],$this->conf['webservicePwd']);
 		$data = $this->webservice->getData('Read', $params);
 		$readResult = $data->ReadResult;
 
@@ -207,10 +204,6 @@ class tx_phzldap_pi3 extends tx_t3evento_pi5 {
 
 	}
 
-}
-
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/phzldap/pi1/class.tx_phzldap_pi1.php'])	{
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/phzldap/pi1/class.tx_phzldap_pi1.php']);
 }
 
 ?>
